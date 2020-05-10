@@ -1,14 +1,37 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
+
 
 #define INT uint64_t
-/*The above define sets the size of the bytecode*/
+/*The above sets the size of the bytecode words*/
 INT *ramArray;
 INT ramSize = 100;
-INT pc;
-INT sp;
-INT fp;
+INT pc = 0;
+INT sp = -1;
+INT fp = -1;
+void iconst(void)
+{
+}
+
+void load(void)
+{
+}
+
+void store(void)
+{
+}
+
+void add(void)
+{
+}
+  
+void decode(void)
+{
+  void (*jumptable[4])(void) = {iconst, load, store, add};
+  jumptable[ramArray[pc]]();
+}
 
 void push(INT value)
 {
@@ -17,7 +40,7 @@ void push(INT value)
     ramArray = realloc(ramArray, ramSize);
     if(ramArray == NULL){
       printf("ERROR: Unable to allocate ramArray!\n");
-      exit 0;
+      exit(0);
     }
   }
   ramArray[sp] = value;
@@ -29,14 +52,17 @@ void pop(void){
   sp--;
 }
     
-int main(void)
+int main(int argc, char **argv)
 {
   ramArray = malloc(sizeof(INT) * ramSize);
   if(ramArray == NULL){
     printf("ERROR: Unable to allocate ramArray!\n");
   }
-  int size = sizeof(ramArray);
+
   printf("Size: %i\n", size);
+
+  
+  
   free(ramArray);
   return 0;
 }
