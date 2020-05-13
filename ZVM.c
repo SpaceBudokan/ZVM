@@ -10,9 +10,12 @@
 INT programRam[100];
 INT *stackArray;
 INT stackSize = 100;
-INT pc = 0;
-INT sp = -1;
-INT fp = -1;
+INT pc = 0; /* program counter */
+INT sp = -1; /* stack pointer */
+INT fp = -1; /* frame pointer */
+INT misc; /* miscellaneous [ointer for loading and storing */
+INT programLength;
+
 
 void push(INT value)
 {
@@ -50,11 +53,18 @@ void iconst(void)
 
 void load(void)
 {
+  pc++;
+  misc = programRam[pc];
+  push(programRam[misc]);
   return;
 }
 
 void store(void)
 {
+  pc++;
+  misc = programRam[pc];
+  programRam[misc] = stackArray[sp];
+  pop();
   return;
 }
 
@@ -64,23 +74,65 @@ void add(void)
   pop();
   return;
 }
+
 void sub(void)
 {
+  stackArray[sp - 1] = stackArray[sp - 1] - stackArray[sp];
+  pop();
   return;
 }
 
 void mult(void)
 {
+  stackArray[sp - 1] = stackArray[sp - 1] * stackArray[sp];
+  pop();
   return;
 }
 
 void divide(void)
 {
+  stackArray[sp - 1] = stackArray[sp - 1] / stackArray[sp];
+  pop();
+  return;
+}
+
+void eq(void)
+{
+  if(stackArray[sp-1] == stackArray[sp]){
+    stackArray[sp - 1] = 1;
+  } else{
+    stackArray[sp - 1] = 0;
+  }
+  pop();
+  return;
+}
+
+void lt(void)
+{
+  if(stackArray[sp-1] < stackArray[sp]){
+    stackArray[sp - 1] = 1;
+  } else{
+    stackArray[sp - 1] = 0;
+  }
+  pop();
+  return;
+}
+
+void gt(void)
+{
+  if(stackArray[sp-1] > stackArray[sp]){
+    stackArray[sp - 1] = 1;
+  } else{
+    stackArray[sp - 1] = 0;
+  }
+  pop();
   return;
 }
 
 void jump(void)
 {
+  pc++;
+  pc = programRam[pc] - 1;
   return;
 }
 
@@ -118,11 +170,19 @@ void pnum(void)
   return;
 }
 
+void halt(void)
+{
+  pc = programLength - 1;
+  return;
+}
+
 void decode(void)
 {
   /*using a jumptable because some compilers aren't too eager to optimize switch-case loops to jumptables */
-  void (*jumptable[15])(void) = {noop, iconst, load, store, add, sub, mult,
-				divide, jump, jsubr, ret, beqz, bneqz, pchar, pnum};
+  void (*jumptable[20])(void) = {noop, iconst, load, store, add,
+				 sub, mult, divide, eq, lt,
+				 gt, jump, jsubr, ret, beqz,
+				 bneqz, pchar, pnum, pop, halt};
   jumptable[programRam[pc]]();
   return;
 }
@@ -139,11 +199,9 @@ int main(int argc, char **argv)
 
   programRam[0] = 1;
   programRam[1] = 1;
-  programRam[2] = 1;
-  programRam[3] = 1;
-  programRam[4] = 4;
-  programRam[5] = 14;
-  while(pc < 6){
+  programRam[2] = 0;
+  programLength = 3;
+  while(pc < programLength){
     decode();
     pc++;
   }
