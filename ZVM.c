@@ -53,16 +53,17 @@ void iconst(void)
 
 void load(void)
 {
-  pc++;
-  misc = programRam[pc];
+  misc = programRam[stackArray[sp]];
+  pop();
   push(programRam[misc]);
   return;
 }
 
 void store(void)
 {
-  pc++;
-  misc = programRam[pc];
+  
+  misc = programRam[stackArray[sp]];
+  pop();
   programRam[misc] = stackArray[sp];
   pop();
   return;
@@ -179,10 +180,13 @@ void halt(void)
 void decode(void)
 {
   /*using a jumptable because some compilers aren't too eager to optimize switch-case loops to jumptables */
-  void (*jumptable[20])(void) = {noop, iconst, load, store, add,
+  void (*jumptable[31])(void) = {noop, iconst, load, store, add,
 				 sub, mult, divide, eq, lt,
-				 gt, jump, jsubr, ret, beqz,
-				 bneqz, pchar, pnum, pop, halt};
+				 gt, not, and, or, xor,
+				 bnot, band, bor, bxor, jump,
+				 dup, swap, over, jsubr, ret,
+				 beqz, bneqz, pchar, pnum, pop,
+				 halt};
   jumptable[programRam[pc]]();
   return;
 }
