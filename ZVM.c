@@ -6,16 +6,21 @@
 
 #define INT uint64_t
 /*The above sets the size of the bytecode words*/
-#define FUNCS 
 INT programRam[100];
 INT *stackArray;
 INT stackSize = 100;
 INT pc = 0; /* program counter */
 INT sp = -1; /* stack pointer */
 INT fp = -1; /* frame pointer */
+INT retval; /*value to return from function call */
+INT numargs; /*number of arguments on the stack for a subroutine */
 INT misc; /* miscellaneous pointer for loading and storing */
 INT programLength;
 
+static inline INT ATOI(const char *str)
+{
+  return strtoull(str, NULL, 10);
+}
 
 void push(INT value)
 {
@@ -229,11 +234,31 @@ void over()
 
 void jsubr(void)
 {
+  INT subaddr;
+  pc++;
+  subaddr = programRam[pc];
+  pc++;
+  numargs = programRam[pc];
+  push(numargs);
+  push(fp);
+  push(pc);
+  fp = sp;
+  pc = subaddr - 1;
   return;
 }
 
 void ret(void)
 {
+  retval= stackArray[sp];
+  pop();
+  sp = fp;
+  pc = stackArray[sp];
+  pop();
+  fp = stackArray[sp];
+  pop();
+  numargs = stackArray[sp];
+  sp -= numargs;
+  stackArray[sp] = retval;
   return;
 }
 
@@ -259,7 +284,7 @@ void bneqz(void)
 
 void pchar(void)
 {
-  printf("%c", (char)stackArray[sp]);
+  printf("%c", (char)(stackArray[sp]));
   pop();
   return;
 }
@@ -301,9 +326,11 @@ int main(int argc, char **argv)
     return 1;
   }
 
+
   programRam[0] = 1;
   programRam[1] = 1;
   programRam[2] = 0;
+  
   programLength = 3;
   while(pc < programLength){
     decode();
