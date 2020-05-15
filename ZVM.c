@@ -19,7 +19,7 @@ INT programLength;
 
 static inline INT ATOI(const char *str)
 {
-  return strtoull(str, NULL, 10);
+  return (INT)atoll(str);
 }
 
 void push(INT value)
