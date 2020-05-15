@@ -13,7 +13,7 @@ INT stackSize = 100;
 INT pc = 0; /* program counter */
 INT sp = -1; /* stack pointer */
 INT fp = -1; /* frame pointer */
-INT misc; /* miscellaneous [ointer for loading and storing */
+INT misc; /* miscellaneous pointer for loading and storing */
 INT programLength;
 
 
@@ -61,7 +61,6 @@ void load(void)
 
 void store(void)
 {
-  
   misc = programRam[stackArray[sp]];
   pop();
   programRam[misc] = stackArray[sp];
@@ -130,10 +129,101 @@ void gt(void)
   return;
 }
 
+void not(void)
+{
+  if(stackArray[sp] == 0){
+    stackArray[sp] = 1;
+  } else{
+    stackArray[sp] = 0;
+  }
+  return;
+}
+
+void and(void)
+{
+  if(stackArray[sp - 1] != 0 && stackArray[sp] != 0){
+    stackArray[sp - 1] = 1;
+  } else{
+    stackArray[sp -1] = 0;
+  }
+  pop();
+  return;
+}
+
+void or(void)
+{
+  if(stackArray[sp - 1] != 0 || stackArray[sp] != 0){
+    stackArray[sp - 1] = 1;
+  } else{
+    stackArray[sp -1] = 0;
+  }
+  pop();
+  return;
+}
+
+void xor(void)
+{
+  if(stackArray[sp - 1] != 0 && stackArray[sp] !=0){
+    stackArray[sp - 1] = 0;
+  } else if(stackArray[sp - 1] == 0 && stackArray[sp] ==0){
+    stackArray[sp -1] = 0;
+  } else{
+    stackArray[sp -1] = 1;
+  }
+  pop();
+  return;
+}
+
+void bnot(void)
+{
+  stackArray[sp] = ~stackArray[sp];
+  return;
+}
+
+void band(void)
+{
+  stackArray[sp -1] = stackArray[sp -1] & stackArray[sp];
+  pop();
+  return;
+}
+
+void bor(void)
+{
+  stackArray[sp -1] = stackArray[sp -1] | stackArray[sp];
+  pop();
+  return;
+}
+
+void bxor(void)
+{
+  stackArray[sp -1] = stackArray[sp -1] ^ stackArray[sp];
+  pop();
+  return;
+}
+
 void jump(void)
 {
   pc++;
   pc = programRam[pc] - 1;
+  return;
+}
+void dup(void)
+{
+  push(stackArray[sp]);
+  return;
+}
+
+void swap()
+{
+  misc = stackArray[sp];
+  stackArray[sp] = stackArray[sp - 1];
+  stackArray[sp - 1] = misc;
+  return;
+}
+
+void over()
+{
+  push(stackArray[sp - 1]);
   return;
 }
 
@@ -149,11 +239,21 @@ void ret(void)
 
 void beqz(void)
 {
+  pc++;
+  if(stackArray[sp] == 0){
+    pc = programRam[pc] - 1;
+  }
+  pop();
   return;
 }
 
 void bneqz(void)
 {
+  pc++;
+  if(stackArray[sp] != 0){
+    pc = programRam[pc] - 1;
+  }
+  pop();
   return;
 }
 
