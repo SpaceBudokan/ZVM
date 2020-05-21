@@ -35,6 +35,7 @@ void push(INT value)
   }
   sp++;
   stackArray[sp] = value;
+  
   return;
 }
 
@@ -80,6 +81,15 @@ void gstore(void)
 
 void aload(void)
 {
+  /*loads the specified function argument to top of stack*/
+  pc++;
+  INT varnum;
+  INT stacknum;
+  INT topush;
+  varnum = programRam[pc];
+  stacknum = ((fp - 3) - varnum);
+  topush = stackArray[stacknum]
+  push(topush);
   return;
 }
 
@@ -384,6 +394,8 @@ void over()
 void jsubr(void)
 {
   /*jumps to a subroutine. expects arguments to already be on the stack*/
+  /*next word is location to jump to*/
+  /*second word is number of arguments subroutine expects*/
   INT subaddr;
   pc++;
   subaddr = programRam[pc];
@@ -481,6 +493,7 @@ void decode(void)
     
 int main(int argc, char **argv)
 {
+  int i = 0;
   stackArray = malloc(sizeof(INT) * stackSize);
   if(stackArray == NULL){
     printf("ERROR: Unable to allocate stackArray!\n");
@@ -489,13 +502,36 @@ int main(int argc, char **argv)
 
 
   programRam[0] = 1;
-  programRam[1] = 1;
-  programRam[2] = 0;
+  programRam[1] = 99;
+  programRam[2] = 1;
+  programRam[3] = 999;
+  programRam[4] = 0;
+  programRam[5] = 47;
+  programRam[6] = 9;
+  programRam[7] = 2;
+  programRam[8] = 54;
+  programRam[9] = 4;
+  programRam[10] = 1;
+  programRam[11] = 4;
+  programRam[12] = 1;
+  programRam[12] = 4;
+  programRam[14] = 1;
+  programRam[15] = 0;
+  programRam[16] = 0;
+  programRam[17] = 48;
+  programRam[18] = 0;
   
-  programLength = 3;
+  programLength = 19;
+  
   while(pc < programLength){
     decode();
     pc++;
+    i = 0;
+    while(i <= sp){
+      printf("%i ", (int)stackArray[i]);
+      i++;
+    }
+    printf("\n");
   }
   
   free(stackArray);
