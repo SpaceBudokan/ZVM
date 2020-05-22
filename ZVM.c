@@ -81,30 +81,37 @@ void gstore(void)
 
 void aload(void) 
 {
-  /*loads the specified function argument to top of stack*/
+  /*loads the function argument specified in next word to top of stack*/
+  /*indexed from zero starting beneath stack frame, moving down the stack*/
   pc++;
-  INT varnum;
-  INT stacknum;
-  INT topush;
-  varnum = programRam[pc];
-  stacknum = ((fp - 3) - varnum);
-  topush = stackArray[stacknum];
-  push(topush);
+  push(stackArray[(fp - 3) - programRam[pc]]);
   return;
 }
 
 void astore(void)
 {
+  /*stores top of stack to function argument specified in next word*/
+  /*indexed from zero starting beneath stack frame, growing down the stack*/
+  pc++;
+  stackArray[(fp - 3) - programRam[pc]] = stackArray[sp];
+  pop();
   return;
 }
 
 void lload(void)
 {
+  /*locals are pushed onto the stack on top of the stack frame.*/
+  /*indexed from zero and grow upwards.*/
+  pc++;
+  push(stackArray[fp + 1 + programRam[pc]]);
   return;
 }
 
 void lstore(void)
 {
+  pc++;
+  stackArray[fp + 1 + programRam[pc]] = stackArray[sp];
+  pop();
   return;
 }
 
@@ -132,31 +139,51 @@ void add(void)
 
 void ginc(void)
 {
+  /*takes address from top of stack and increments value at that adress*/
+  programRam[stackArray[sp]]++;
+  pop();
   return;
 }
 
 void gdec(void)
 {
+  /*takes address from top of stack and decrements it*/
+  programRam[stackArray[sp]]--;
+  pop();
   return;
 }
 
 void ainc(void)
 {
+  /*increments argument at offset in next word*/
+  pc++;
+  stackArray[(fp - 3) - strackArray[sp]]++;
+  pop();
   return;
 }
 
 void adec(void)
 {
+  /*decrements argument at offset in next word*/
+  pc++;
+  stackArray[(fp - 3) - strackArray[sp]]--;
+  pop();
   return;
 }
 
 void linc(void)
 {
+  /*increments local variable at offset in next word*/
+  pc++;
+  stackArray[fp + 1 + programRam[pc]]++;
   return;
 }
 
 void ldec(void)
 {
+  /*decrements local variable at offset in next word*/
+  pc++;
+  stackArray[fp + 1 + programRam[pc]]--;
   return;
 }
 
@@ -510,16 +537,16 @@ int main(int argc, char **argv)
   programRam[6] = 9;
   programRam[7] = 2;
   programRam[8] = 54;
-  programRam[9] = 4;
-  programRam[10] = 1;
-  programRam[11] = 4;
-  programRam[12] = 1;
-  programRam[13] = 4;
-  programRam[14] = 1;
-  programRam[15] = 0;
-  programRam[16] = 0;
-  programRam[17] = 48;
-  programRam[18] = 0;
+  programRam[9] = 1;
+  programRam[10] = 3;
+  programRam[11] = 1;
+  programRam[12] = 5;
+  programRam[13] = 7;
+  programRam[14] = 0;
+  programRam[15] = 52;
+  programRam[16] = 1;
+  programRam[17] = 0;
+  programRam[18] = 48;
   
   programLength = 19;
   
