@@ -79,7 +79,7 @@ void gstore(void)
   return;
 }
 
-void aload(void)
+void aload(void) 
 {
   /*loads the specified function argument to top of stack*/
   pc++;
@@ -88,7 +88,7 @@ void aload(void)
   INT topush;
   varnum = programRam[pc];
   stacknum = ((fp - 3) - varnum);
-  topush = stackArray[stacknum]
+  topush = stackArray[stacknum];
   push(topush);
   return;
 }
@@ -514,7 +514,7 @@ int main(int argc, char **argv)
   programRam[10] = 1;
   programRam[11] = 4;
   programRam[12] = 1;
-  programRam[12] = 4;
+  programRam[13] = 4;
   programRam[14] = 1;
   programRam[15] = 0;
   programRam[16] = 0;
